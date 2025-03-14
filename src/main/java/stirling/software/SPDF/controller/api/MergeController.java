@@ -12,7 +12,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentCatalog;
@@ -34,7 +33,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 
 import stirling.software.SPDF.model.api.general.MergePdfsRequest;
-import stirling.software.SPDF.service.CustomPDDocumentFactory;
+import stirling.software.SPDF.service.CustomPDFDocumentFactory;
 import stirling.software.SPDF.utils.GeneralUtils;
 import stirling.software.SPDF.utils.WebResponseUtils;
 
@@ -44,10 +43,10 @@ import stirling.software.SPDF.utils.WebResponseUtils;
 @Tag(name = "General", description = "General APIs")
 public class MergeController {
 
-    private final CustomPDDocumentFactory pdfDocumentFactory;
+    private final CustomPDFDocumentFactory pdfDocumentFactory;
 
     @Autowired
-    public MergeController(CustomPDDocumentFactory pdfDocumentFactory) {
+    public MergeController(CustomPDFDocumentFactory pdfDocumentFactory) {
         this.pdfDocumentFactory = pdfDocumentFactory;
     }
 
@@ -101,8 +100,8 @@ public class MergeController {
                 };
             case "byPDFTitle":
                 return (file1, file2) -> {
-                    try (PDDocument doc1 = Loader.loadPDF(file1.getBytes());
-                            PDDocument doc2 = Loader.loadPDF(file2.getBytes())) {
+                    try (PDDocument doc1 = pdfDocumentFactory.load(file1);
+                            PDDocument doc2 = pdfDocumentFactory.load(file2)) {
                         String title1 = doc1.getDocumentInformation().getTitle();
                         String title2 = doc2.getDocumentInformation().getTitle();
                         return title1.compareTo(title2);
@@ -120,7 +119,9 @@ public class MergeController {
     @Operation(
             summary = "Merge multiple PDF files into one",
             description =
-                    "This endpoint merges multiple PDF files into a single PDF file. The merged file will contain all pages from the input files in the order they were provided. Input:PDF Output:PDF Type:MISO")
+                    "This endpoint merges multiple PDF files into a single PDF file. The merged"
+                            + " file will contain all pages from the input files in the order they were"
+                            + " provided. Input:PDF Output:PDF Type:MISO")
     public ResponseEntity<byte[]> mergePdfs(@ModelAttribute MergePdfsRequest form)
             throws IOException {
         List<File> filesToDelete = new ArrayList<>(); // List of temporary files to delete
@@ -152,7 +153,7 @@ public class MergeController {
             byte[] mergedPdfBytes = docOutputstream.toByteArray(); // Get merged document bytes
 
             // Load the merged PDF document
-            mergedDocument = Loader.loadPDF(mergedPdfBytes);
+            mergedDocument = pdfDocumentFactory.load(mergedPdfBytes);
 
             // Remove signatures if removeCertSign is true
             if (removeCertSign) {

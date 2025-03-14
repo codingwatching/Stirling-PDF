@@ -25,7 +25,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import stirling.software.SPDF.model.api.security.SanitizePdfRequest;
-import stirling.software.SPDF.service.CustomPDDocumentFactory;
+import stirling.software.SPDF.service.CustomPDFDocumentFactory;
 import stirling.software.SPDF.utils.WebResponseUtils;
 
 @RestController
@@ -33,10 +33,10 @@ import stirling.software.SPDF.utils.WebResponseUtils;
 @Tag(name = "Security", description = "Security APIs")
 public class SanitizeController {
 
-    private final CustomPDDocumentFactory pdfDocumentFactory;
+    private final CustomPDFDocumentFactory pdfDocumentFactory;
 
     @Autowired
-    public SanitizeController(CustomPDDocumentFactory pdfDocumentFactory) {
+    public SanitizeController(CustomPDFDocumentFactory pdfDocumentFactory) {
         this.pdfDocumentFactory = pdfDocumentFactory;
     }
 
@@ -45,7 +45,7 @@ public class SanitizeController {
             summary = "Sanitize a PDF file",
             description =
                     "This endpoint processes a PDF file and removes specific elements based on the"
-                        + " provided options. Input:PDF Output:PDF Type:SISO")
+                            + " provided options. Input:PDF Output:PDF Type:SISO")
     public ResponseEntity<byte[]> sanitizePDF(@ModelAttribute SanitizePdfRequest request)
             throws IOException {
         MultipartFile inputFile = request.getFileInput();

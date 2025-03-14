@@ -14,7 +14,6 @@ import java.util.zip.ZipOutputStream;
 import javax.imageio.*;
 import javax.imageio.stream.ImageOutputStream;
 
-import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -36,7 +35,7 @@ import io.github.pixee.security.Filenames;
 
 import lombok.extern.slf4j.Slf4j;
 
-import stirling.software.SPDF.service.CustomPDDocumentFactory;
+import stirling.software.SPDF.service.CustomPDFDocumentFactory;
 
 @Slf4j
 public class PdfUtils {
@@ -128,6 +127,7 @@ public class PdfUtils {
     }
 
     public static byte[] convertFromPdf(
+            CustomPDFDocumentFactory pdfDocumentFactory,
             byte[] inputStream,
             String imageType,
             ImageType colorType,
@@ -135,7 +135,7 @@ public class PdfUtils {
             int DPI,
             String filename)
             throws IOException, Exception {
-        try (PDDocument document = Loader.loadPDF(inputStream)) {
+        try (PDDocument document = pdfDocumentFactory.load(inputStream)) {
             PDFRenderer pdfRenderer = new PDFRenderer(document);
             pdfRenderer.setSubsamplingAllowed(true);
             int pageCount = document.getNumberOfPages();
@@ -315,7 +315,7 @@ public class PdfUtils {
             String fitOption,
             boolean autoRotate,
             String colorType,
-            CustomPDDocumentFactory pdfDocumentFactory)
+            CustomPDFDocumentFactory pdfDocumentFactory)
             throws IOException {
         try (PDDocument doc = pdfDocumentFactory.createNewDocument()) {
             for (MultipartFile file : files) {
@@ -405,7 +405,7 @@ public class PdfUtils {
     }
 
     public static byte[] overlayImage(
-            CustomPDDocumentFactory pdfDocumentFactory,
+            CustomPDFDocumentFactory pdfDocumentFactory,
             byte[] pdfBytes,
             byte[] imageBytes,
             float x,

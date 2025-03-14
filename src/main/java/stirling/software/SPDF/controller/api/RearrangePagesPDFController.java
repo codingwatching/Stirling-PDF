@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 import stirling.software.SPDF.model.SortTypes;
 import stirling.software.SPDF.model.api.PDFWithPageNums;
 import stirling.software.SPDF.model.api.general.RearrangePagesRequest;
-import stirling.software.SPDF.service.CustomPDDocumentFactory;
+import stirling.software.SPDF.service.CustomPDFDocumentFactory;
 import stirling.software.SPDF.utils.GeneralUtils;
 import stirling.software.SPDF.utils.WebResponseUtils;
 
@@ -35,10 +34,10 @@ import stirling.software.SPDF.utils.WebResponseUtils;
 @Tag(name = "General", description = "General APIs")
 public class RearrangePagesPDFController {
 
-    private final CustomPDDocumentFactory pdfDocumentFactory;
+    private final CustomPDFDocumentFactory pdfDocumentFactory;
 
     @Autowired
-    public RearrangePagesPDFController(CustomPDDocumentFactory pdfDocumentFactory) {
+    public RearrangePagesPDFController(CustomPDFDocumentFactory pdfDocumentFactory) {
         this.pdfDocumentFactory = pdfDocumentFactory;
     }
 
@@ -46,7 +45,9 @@ public class RearrangePagesPDFController {
     @Operation(
             summary = "Remove pages from a PDF file",
             description =
-                    "This endpoint removes specified pages from a given PDF file. Users can provide a comma-separated list of page numbers or ranges to delete. Input:PDF Output:PDF Type:SISO")
+                    "This endpoint removes specified pages from a given PDF file. Users can provide"
+                            + " a comma-separated list of page numbers or ranges to delete. Input:PDF"
+                            + " Output:PDF Type:SISO")
     public ResponseEntity<byte[]> deletePages(@ModelAttribute PDFWithPageNums request)
             throws IOException {
 
@@ -243,7 +244,10 @@ public class RearrangePagesPDFController {
     @Operation(
             summary = "Rearrange pages in a PDF file",
             description =
-                    "This endpoint rearranges pages in a given PDF file based on the specified page order or custom mode. Users can provide a page order as a comma-separated list of page numbers or page ranges, or a custom mode. Input:PDF Output:PDF")
+                    "This endpoint rearranges pages in a given PDF file based on the specified page"
+                            + " order or custom mode. Users can provide a page order as a"
+                            + " comma-separated list of page numbers or page ranges, or a custom mode."
+                            + " Input:PDF Output:PDF")
     public ResponseEntity<byte[]> rearrangePages(@ModelAttribute RearrangePagesRequest request)
             throws IOException {
         MultipartFile pdfFile = request.getFileInput();
@@ -251,7 +255,7 @@ public class RearrangePagesPDFController {
         String sortType = request.getCustomMode();
         try {
             // Load the input PDF
-            PDDocument document = Loader.loadPDF(pdfFile.getBytes());
+            PDDocument document = pdfDocumentFactory.load(pdfFile);
 
             // Split the page order string into an array of page numbers or range of numbers
             String[] pageOrderArr = pageOrder != null ? pageOrder.split(",") : new String[0];

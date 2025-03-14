@@ -68,7 +68,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 
 import stirling.software.SPDF.model.api.security.SignPDFWithCertRequest;
-import stirling.software.SPDF.service.CustomPDDocumentFactory;
+import stirling.software.SPDF.service.CustomPDFDocumentFactory;
 import stirling.software.SPDF.utils.WebResponseUtils;
 
 @RestController
@@ -81,16 +81,16 @@ public class CertSignController {
         Security.addProvider(new BouncyCastleProvider());
     }
 
-    private final CustomPDDocumentFactory pdfDocumentFactory;
+    private final CustomPDFDocumentFactory pdfDocumentFactory;
 
     @Autowired
-    public CertSignController(CustomPDDocumentFactory pdfDocumentFactory) {
+    public CertSignController(CustomPDFDocumentFactory pdfDocumentFactory) {
         this.pdfDocumentFactory = pdfDocumentFactory;
     }
 
     private static void sign(
-            CustomPDDocumentFactory pdfDocumentFactory,
-            byte[] input,
+            CustomPDFDocumentFactory pdfDocumentFactory,
+            MultipartFile input,
             OutputStream output,
             CreateSignature instance,
             Boolean showSignature,
@@ -130,8 +130,8 @@ public class CertSignController {
             summary = "Sign PDF with a Digital Certificate",
             description =
                     "This endpoint accepts a PDF file, a digital certificate and related"
-                        + " information to sign the PDF. It then returns the digitally signed PDF"
-                        + " file. Input:PDF Output:PDF Type:SISO")
+                            + " information to sign the PDF. It then returns the digitally signed PDF"
+                            + " file. Input:PDF Output:PDF Type:SISO")
     public ResponseEntity<byte[]> signPDFWithCert(@ModelAttribute SignPDFWithCertRequest request)
             throws Exception {
         MultipartFile pdf = request.getFileInput();
@@ -179,7 +179,7 @@ public class CertSignController {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         sign(
                 pdfDocumentFactory,
-                pdf.getBytes(),
+                pdf,
                 baos,
                 createSignature,
                 showSignature,
